@@ -4,7 +4,6 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
-import { redirectBasedOnRole } from '../auth'
 
 export async function login(formData: FormData) {
   const supabase = await createClient()
@@ -22,11 +21,8 @@ export async function login(formData: FormData) {
 
   revalidatePath('/', 'layout')
   
-  const redirectPath = await redirectBasedOnRole()
-  redirect(redirectPath)
+  redirect('/catalog')
 }
-
-
 
 export async function signup(formData: FormData) {
   const supabase = await createClient()
@@ -43,7 +39,7 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/catalog')
 }
 
 export async function logout() {
@@ -58,4 +54,27 @@ export async function logout() {
   
   revalidatePath('/', 'layout')
   redirect('/login')
+}
+
+export async function signInWithGoogle() {
+  const supabase = await createClient();
+  const origin = process.env.NEXT_PUBLIC_SITE_URL!;
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: `${origin}/auth/callback`,
+    },
+  });
+
+  if (error) {
+    console.error('Error signing in with Google:', error);
+    return redirect('/error');
+  }
+
+  if (data.url) {
+    return redirect(data.url);
+  }
+
+  return redirect('/login?message=Could not authenticate with Google');
 }
