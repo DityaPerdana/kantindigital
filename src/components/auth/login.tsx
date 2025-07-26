@@ -1,4 +1,4 @@
-import { login, signInWithGithub, signInWithGoogle, signup } from "@/utils/server/action";
+import { login, signInWithGoogle, signup } from "@/utils/server/action";
 
 // Komponen Ikon untuk Google dan GitHub (SVG disematkan langsung)
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
