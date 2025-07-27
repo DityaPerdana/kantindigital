@@ -48,7 +48,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (user && request.nextUrl.pathname.startsWith('/dashboard')) {
+  if (user && request.nextUrl.pathname.startsWith('/dashboard/order')) {
     const { data: userData, error } = await supabase
       .from('users')
       .select('role_id')
