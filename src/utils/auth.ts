@@ -2,7 +2,6 @@ import { createClient } from '@/utils/supabase/server'
 
 export async function getUserRole(): Promise<number | null> {
   const supabase = await createClient()
-  
   const { data: { user } } = await supabase.auth.getUser()
   
   if (!user) {
@@ -12,7 +11,7 @@ export async function getUserRole(): Promise<number | null> {
   const { data: userData } = await supabase
     .from('users')
     .select('role_id')
-    .eq('userid', user.id)
+    .eq('userid', user.id) 
     .single()
 
   return userData?.role_id ?? null

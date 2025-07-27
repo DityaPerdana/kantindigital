@@ -49,7 +49,7 @@ const data = {
     },
     {
       title: "Users",
-      url: "/dashboard/users",
+      url: "/dashboard/user",
       icon: IconChartBar,
     },
   ],
@@ -78,7 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* <NavSecondary items={data.navMain} className="mt-auto" /> */}
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   )

@@ -1,45 +1,72 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from './utils/supabase/middleware'
-import { createClient } from './utils/supabase/server'
 
 export async function middleware(request: NextRequest) {
-  const response = await updateSession(request)
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
+  const { supabaseResponse, user, supabase } = await updateSession(request)
   const { pathname } = request.nextUrl
 
-  // Redirect to login if trying to access dashboard without a session
-  if (!user && pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  // Allow unauthenticated access to public routes
+  const publicRoutes = ['/', '/login', '/auth', '/error', '/signup']
+  const isPublicRoute = publicRoutes.some(route => 
+    pathname === route || pathname.startsWith('/auth/')
+  )
+
+  // If no user and trying to access protected routes, redirect to login
+  if (!user && !isPublicRoute) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
   }
 
-  // If user is logged in, check their role and apply redirects
+  // If user exists, handle role-based redirects
   if (user) {
-    // Fetch user role once to avoid redundant DB calls
+    // Fetch user role
     const { data: userData } = await supabase
       .from('users')
       .select('role_id')
       .eq('userid', user.id)
       .single()
 
-    const isAdmin = userData?.role_id === 2
+    const userRole = userData?.role_id
+    const isAdmin = userRole === 2
+    const isCustomer = userRole === 1
 
-    // If a non-admin tries to access the dashboard, redirect them
-    if (!isAdmin && pathname.startsWith('/dashboard')) {
-      return NextResponse.redirect(new URL('/catalog', request.url))
+    // Redirect /dashboard to /dashboard/order
+    if (pathname === '/dashboard') {
+      const url = request.nextUrl.clone()
+      url.pathname = '/dashboard/order'
+      return NextResponse.redirect(url)
     }
 
-    // If an admin tries to access the catalog, redirect them to the dashboard
-    if (isAdmin && pathname.startsWith('/catalog')) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
+    // Admin access control
+    if (pathname.startsWith('/dashboard')) {
+      if (!isAdmin) {
+        // Non-admin trying to access dashboard - redirect to catalog
+        const url = request.nextUrl.clone()
+        url.pathname = '/catalog'
+        return NextResponse.redirect(url)
+      }
+    }
+
+    // Customer access control
+    if (pathname.startsWith('/catalog')) {
+      if (isAdmin) {
+        // Admin trying to access catalog - redirect to dashboard
+        const url = request.nextUrl.clone()
+        url.pathname = '/dashboard/order'
+        return NextResponse.redirect(url)
+      }
+    }
+
+    // If logged in user tries to access login page, redirect based on role
+    if (pathname === '/login' || pathname === '/signup') {
+      const url = request.nextUrl.clone()
+      url.pathname = isAdmin ? '/dashboard/order' : '/catalog'
+      return NextResponse.redirect(url)
     }
   }
 
-  return response
+  return supabaseResponse
 }
 
 export const config = {
@@ -49,7 +76,6 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
