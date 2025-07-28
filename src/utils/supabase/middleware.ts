@@ -19,9 +19,21 @@ export async function updateSession(request: NextRequest) {
           supabaseResponse = NextResponse.next({
             request,
           })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
+          cookiesToSet.forEach(({ name, value, options }) => {
+            // Fix cookie options for production
+            const cookieOptions = {
+              ...options,
+              // Ensure cookies work across subdomains in production
+              domain: process.env.NODE_ENV === 'production' 
+                ? '.vercel.app' 
+                : options?.domain,
+              // Ensure secure cookies in production
+              secure: process.env.NODE_ENV === 'production',
+              // SameSite should be 'lax' for auth cookies
+              sameSite: 'lax' as const,
+            }
+            supabaseResponse.cookies.set(name, value, cookieOptions)
+          })
         },
       },
     }

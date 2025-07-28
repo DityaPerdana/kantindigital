@@ -68,24 +68,27 @@ export async function logout() {
 }
 
 export async function signInWithGoogle() {
-  const supabase = await createClient()
-  const origin = process.env.NEXT_PUBLIC_SITE_URL!
-
+  const supabase = await createClient();
+  // Use the correct production URL
+  const origin = process.env.NODE_ENV === 'production' 
+    ? 'https://kantindigital-eight.vercel.app'
+    : process.env.NEXT_PUBLIC_SITE_URL!;
+    
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
       redirectTo: `${origin}/auth/callback`,
     },
-  })
+  });
 
   if (error) {
-    console.error('Error signing in with Google:', error)
-    return redirect('/error')
+    console.error('Error signing in with Google:', error);
+    return redirect('/error');
   }
 
   if (data.url) {
-    return redirect(data.url)
+    return redirect(data.url);
   }
 
-  return redirect('/login?message=Could not authenticate with Google')
+  return redirect('/login?message=Could not authenticate with Google');
 }
