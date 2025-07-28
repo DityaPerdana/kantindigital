@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Pencil } from "lucide-react"
+import { Plus, Pencil, Upload, X } from "lucide-react"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 interface MenuFormData {
   menuname: string
@@ -33,6 +34,7 @@ interface MenuModalProps {
 export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const router = useRouter()
   const [formData, setFormData] = useState<MenuFormData>({
     menuname: menuItem?.name || '',
@@ -41,6 +43,56 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
     category_id: menuItem?.category?.toString() || '',
     image_url: menuItem?.image || ''
   })
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB')
+      return
+    }
+
+    setUploading(true)
+    
+    try {
+      const uploadFormData = new FormData()
+      uploadFormData.append('file', file)
+
+      const response = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: uploadFormData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image')
+      }
+
+      const data = await response.json()
+      
+      if (data.success && data.url) {
+        setFormData(prev => ({ ...prev, image_url: data.url }))
+      } else {
+        throw new Error('Invalid response from upload service')
+      }
+    } catch (error) {
+      console.error('Error uploading image:', error)
+      alert('Failed to upload image. Please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, image_url: '' }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -108,7 +160,7 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {mode === 'create' ? 'Create New Menu Item' : 'Edit Menu Item'}
@@ -175,13 +227,65 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="image_url">Image URL</Label>
+          <div className="space-y-3">
+            <Label>Image</Label>
+            
+            {/* Image Preview */}
+            {formData.image_url && (
+              <div className="relative inline-block">
+                <div className="relative w-32 h-32 rounded-lg overflow-hidden border">
+                  <Image
+                    src={formData.image_url}
+                    alt="Menu item preview"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="sm"
+                  className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                  onClick={removeImage}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+
+            {/* File Upload */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={uploading}
+                  onClick={() => document.getElementById('image-upload')?.click()}
+                  className="flex items-center gap-2"
+                >
+                  <Upload className="h-4 w-4" />
+                  {uploading ? 'Uploading...' : 'Upload Image'}
+                </Button>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Or enter image URL below. Max file size: 5MB
+              </p>
+            </div>
+
+            {/* URL Input */}
             <Input
               id="image_url"
               value={formData.image_url}
               onChange={(e) => handleInputChange('image_url', e.target.value)}
-              placeholder="Enter image URL or upload link"
+              placeholder="Enter image URL or upload file above"
             />
           </div>
 
@@ -194,7 +298,7 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
+            <Button type="submit" disabled={loading || uploading}>
               {loading ? 'Saving...' : mode === 'create' ? 'Create Item' : 'Update Item'}
             </Button>
           </div>
