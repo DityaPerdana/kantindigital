@@ -1,4 +1,3 @@
-import Image from "next/image"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { createClient } from "@/utils/supabase/server"
