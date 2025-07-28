@@ -7,11 +7,11 @@ import { ProductGrid } from "@/components/catalog/productGrid"
 import handleLogout from "@/utils/handleLogout"
 
 interface PageProps {
-  searchParams: {
+  searchParams: Promise<{
     category?: string
     search?: string
     sort?: string
-  }
+  }>
 }
 
 function getFilteredItems(items: any[], categoryName = "Semua", search = "", sort = "menuname") {
