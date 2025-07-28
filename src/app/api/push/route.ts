@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import webpush from 'web-push'
 
-// Configure web-push
 webpush.setVapidDetails(
   process.env.VAPID_SUBJECT!,
   process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,

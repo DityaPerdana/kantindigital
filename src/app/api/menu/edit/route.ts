@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
     const category_id = parseInt(formData.get('category_id') as string)
     const image_url = formData.get('image_url') as string
 
-    // Validate and format price (max 99999.99 for numeric(7,2))
     const price = parseFloat(priceInput)
     
     if (isNaN(price) || price < 0) {
@@ -23,7 +22,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Price cannot exceed Rp 99,999.99' }, { status: 400 })
     }
 
-    // Round to 2 decimal places
     const formattedPrice = Math.round(price * 100) / 100
 
     const supabase = await createClient()

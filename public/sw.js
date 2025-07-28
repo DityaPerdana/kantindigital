@@ -46,7 +46,6 @@ self.addEventListener('notificationclick', (event) => {
   event.notification.close()
 
   if (event.action === 'view' || !event.action) {
-    // Open the dashboard
     event.waitUntil(
       self.clients.openWindow('/dashboard')
     )

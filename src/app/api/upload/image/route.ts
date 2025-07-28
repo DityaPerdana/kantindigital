@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { v2 as cloudinary } from 'cloudinary'
 
-// Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -17,30 +16,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
     }
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       return NextResponse.json({ error: 'Only image files are allowed' }, { status: 400 })
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json({ error: 'File size must be less than 5MB' }, { status: 400 })
     }
 
-    // Convert file to buffer
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
 
-    // Upload to Cloudinary
     const uploadResponse = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
         {
           resource_type: 'image',
-          folder: 'menu-items', // Optional: organize uploads in a folder
-          format: 'webp', // Convert to WebP for better compression
-          quality: 'auto:good', // Automatic quality optimization
+          folder: 'menu-items',
+          format: 'webp',
+          quality: 'auto:good',
           transformation: [
-            { width: 800, height: 600, crop: 'limit' }, // Limit max dimensions
+            { width: 800, height: 600, crop: 'limit' },
             { quality: 'auto:good', fetch_format: 'auto' }
           ]
         },

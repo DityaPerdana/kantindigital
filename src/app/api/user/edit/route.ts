@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
-    const userid = formData.get('userid') as string // Get userid for identification
+    const userid = formData.get('userid') as string
     const username = formData.get('username') as string
     const email = formData.get('email') as string
     const role_id = parseInt(formData.get('role_id') as string)
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
         email,
         role_id
       })
-      .eq('userid', userid) // Use userid as identifier
+      .eq('userid', userid)
 
     if (error) {
       console.log(error)

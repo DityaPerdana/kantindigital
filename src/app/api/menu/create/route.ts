@@ -13,7 +13,6 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient()
     
-    // Jika menuid adalah auto-increment, jangan sertakan dalam insert
     const { error } = await supabase
       .from('menu')
       .insert([{

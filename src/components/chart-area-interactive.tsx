@@ -82,7 +82,6 @@ export function ChartAreaInteractive({ salesData }: ChartAreaInteractiveProps) {
       })
       .map((item) => ({
         ...item,
-        // Convert revenue to thousands for better chart readability
         revenue: Math.round(Number(item.revenue) / 1000),
         orders: Number(item.orderCount)
       }))

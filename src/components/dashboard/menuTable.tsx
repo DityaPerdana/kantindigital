@@ -16,7 +16,6 @@ interface Menu {
 export default async function MenuTable() {
   const supabase = await createClient()
 
-  // Fetch menu items
   const { data, error } = await supabase
     .from('menu')
     .select()
@@ -25,7 +24,6 @@ export default async function MenuTable() {
     return <h1>Error fetch menu data</h1>
   }
 
-  // Fetch categories from category table
   const { data: categoriesData, error: categoriesError } = await supabase
     .from('category')
     .select('categoryid, categoryname')
@@ -103,7 +101,6 @@ export default async function MenuTable() {
                     <img 
                       src={item.image || "/placeholder.svg"} 
                       alt={item.name} 
-                      // fill 
                       className="object-cover" 
                     />
                   </div>

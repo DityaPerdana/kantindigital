@@ -3,11 +3,8 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
-  IconCreditCard,
   IconDotsVertical,
   IconLogout,
-  IconNotification,
-  IconUserCircle,
 } from "@tabler/icons-react"
 
 import {
@@ -18,7 +15,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -56,16 +52,14 @@ export function NavUser() {
     try {
       setLoading(true)
       
-      // Get current authenticated user
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser()
       
       if (authError || !authUser) {
         console.error('Auth error:', authError)
-        router.push('/login') // Redirect to login if not authenticated
+        router.push('/login') 
         return
       }
 
-      // Fetch additional user data from users table
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('userid, username, email, role_id')
@@ -74,7 +68,6 @@ export function NavUser() {
 
       if (userError) {
         console.error('User data error:', userError)
-        // Use auth user data as fallback
         setUser({
           id: authUser.id,
           name: authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
@@ -82,7 +75,6 @@ export function NavUser() {
           avatar: authUser.user_metadata?.avatar_url || '',
         })
       } else {
-        // Combine auth data with database data
         setUser({
           id: userData.userid,
           name: userData.username || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
@@ -109,7 +101,6 @@ export function NavUser() {
         return
       }
       
-      // Redirect to login page
       router.push('/login')
       router.refresh()
     } catch (error) {
@@ -219,7 +210,6 @@ export function NavUser() {
   )
 }
 
-// Alternative version if you want to pass user data as props
 export function NavUserWithProps({
   user,
 }: {
@@ -243,7 +233,6 @@ export function NavUserWithProps({
         return
       }
       
-      // Redirect to login page
       router.push('/login')
       router.refresh()
     } catch (error) {

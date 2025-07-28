@@ -1,9 +1,9 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: NextRequest) { // Changed to POST for consistency
+export async function POST(request: NextRequest) {
   try {
-    const { userid } = await request.json() // Use userid instead of username
+    const { userid } = await request.json()
     
     const supabase = await createClient()
     

@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       .insert([{
         username,
         email,
-        role_id, // Fixed: should be role_id based on your schema
+        role_id,
       }]);
 
     if (error) {

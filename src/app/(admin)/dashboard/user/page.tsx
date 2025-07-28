@@ -5,7 +5,6 @@ import { UserModal } from "@/components/dashboard/userModal";
 export default async function Page() {
   const supabase = await createClient();
   
-  // Fetch users with roles
   const { data: users, error: usersError } = await supabase
     .from("users")
     .select("*, roles(rolename)");
@@ -14,7 +13,6 @@ export default async function Page() {
     return <div>Error loading users: {usersError.message}</div>
   }
 
-  // Fetch all roles for the dropdown
   const { data: roles, error: rolesError } = await supabase
     .from("roles")  
     .select("roleid, rolename");

@@ -45,6 +45,7 @@ export default async function Page() {
           </div>
     )
   } catch (error) {
+    console.log(error)
     return (
       <div className="p-4">
         <p>Error loading dashboard</p>

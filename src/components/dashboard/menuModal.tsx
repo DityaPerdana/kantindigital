@@ -39,7 +39,7 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
   const [formData, setFormData] = useState<MenuFormData>({
     menuname: menuItem?.name || '',
     stok: menuItem?.stock || 0,
-    price: menuItem?.price?.replace(/[^\d]/g, '') || '', // Remove formatting
+    price: menuItem?.price?.replace(/[^\d]/g, '') || '',
     category_id: menuItem?.category?.toString() || '',
     image_url: menuItem?.image || ''
   })
@@ -48,13 +48,11 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file')
       return
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert('File size must be less than 5MB')
       return
@@ -124,7 +122,6 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
       setOpen(false)
       router.refresh()
       
-      // Reset form for create mode
       if (mode === 'create') {
         setFormData({
           menuname: '',
@@ -230,7 +227,6 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
           <div className="space-y-3">
             <Label>Image</Label>
             
-            {/* Image Preview */}
             {formData.image_url && (
               <div className="relative inline-block">
                 <div className="relative w-32 h-32 rounded-lg overflow-hidden border">
@@ -253,7 +249,6 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
               </div>
             )}
 
-            {/* File Upload */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Button
@@ -270,7 +265,6 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
                 <input
                   id="image-upload"
                   type="file"
-                  accept="image/*"
                   onChange={handleFileUpload}
                   className="hidden"
                 />
@@ -280,7 +274,6 @@ export function MenuModal({ mode, menuItem, categories = [] }: MenuModalProps) {
               </p>
             </div>
 
-            {/* URL Input */}
             <Input
               id="image_url"
               value={formData.image_url}

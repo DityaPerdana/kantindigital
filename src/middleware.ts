@@ -7,7 +7,7 @@ export async function middleware(request: NextRequest) {
 
   // Allow unauthenticated access to public routes
   const publicRoutes = ['/', '/login', '/auth', '/error', '/signup']
-  const isPublicRoute = publicRoutes.some(route => 
+  const isPublicRoute = publicRoutes.some(route =>
     pathname === route || pathname.startsWith('/auth/')
   )
 
@@ -21,7 +21,7 @@ export async function middleware(request: NextRequest) {
   // If user exists, handle role-based redirects
   if (user) {
     // Fetch user role
-    const { data: userData } = await supabase
+    const { data: userData, error } = await supabase
       .from('users')
       .select('role_id')
       .eq('userid', user.id)
@@ -30,6 +30,13 @@ export async function middleware(request: NextRequest) {
     const userRole = userData?.role_id
     const isAdmin = userRole === 2
     const isCustomer = userRole === 1
+
+    // Redirect logged-in users from root to their appropriate dashboard
+    if (pathname === '/') {
+      const url = request.nextUrl.clone()
+      url.pathname = isAdmin ? '/dashboard/order' : '/catalog'
+      return NextResponse.redirect(url)
+    }
 
     // Redirect /dashboard to /dashboard/order
     if (pathname === '/dashboard') {
@@ -41,7 +48,6 @@ export async function middleware(request: NextRequest) {
     // Admin access control
     if (pathname.startsWith('/dashboard')) {
       if (!isAdmin) {
-        // Non-admin trying to access dashboard - redirect to catalog
         const url = request.nextUrl.clone()
         url.pathname = '/catalog'
         return NextResponse.redirect(url)
@@ -51,7 +57,6 @@ export async function middleware(request: NextRequest) {
     // Customer access control
     if (pathname.startsWith('/catalog')) {
       if (isAdmin) {
-        // Admin trying to access catalog - redirect to dashboard
         const url = request.nextUrl.clone()
         url.pathname = '/dashboard/order'
         return NextResponse.redirect(url)
@@ -65,7 +70,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url)
     }
   }
-
+  
   return supabaseResponse
 }
 
@@ -76,7 +81,10 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - sw.js (service worker)
+     * - manifest files
+     * - robots.txt, sitemap.xml
      */
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|sw.js|manifest|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|js|css|ico)$).*)',
   ],
 }

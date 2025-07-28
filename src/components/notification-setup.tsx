@@ -22,7 +22,6 @@ export function NotificationSetup() {
         setPermission('granted')
       }
     } catch (error) {
-      // Silent error handling
     }
   }
 

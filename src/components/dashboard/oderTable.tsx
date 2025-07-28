@@ -62,8 +62,7 @@ export function OrdersTable({ initialOrders, statuses }: OrdersTableProps) {
     setUpdating(orderId)
     try {
       await updateOrderStatus(orderId, parseInt(statusId))
-    } catch (error) {
-      // Silent error handling
+    } catch {
     } finally {
       setUpdating(null)
     }

@@ -1,7 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
 
-// Fungsi untuk membuat pengguna baru
 export async function POST(request: NextRequest) {
     try {
         const formData = await request.formData();
@@ -28,7 +27,6 @@ export async function POST(request: NextRequest) {
     }
 }
 
-// Fungsi untuk menghapus pengguna
 export async function DELETE(request: NextRequest) {
     try {
         const { username } = await request.json();
@@ -47,7 +45,6 @@ export async function DELETE(request: NextRequest) {
     }
 }
 
-// Fungsi untuk mengedit pengguna
 export async function PUT(request: NextRequest) {
     try {
         const { username, email, role_id, originalUsername } = await request.json();
