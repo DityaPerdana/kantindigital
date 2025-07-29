@@ -1,10 +1,8 @@
 import { createClient } from "@/utils/supabase/server"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { SearchAndFilters } from "@/components/catalog/searchFilters"
 import { CategoryTabs } from "@/components/catalog/categoryTabs"
 import { ProductGrid } from "@/components/catalog/productGrid"
-import handleLogout from "@/utils/handleLogout"
 import LogoutButton from "@/components/landingPage/LogoutButton"
 
 interface PageProps {
