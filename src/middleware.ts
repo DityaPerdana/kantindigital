@@ -91,7 +91,6 @@ export async function middleware(request: NextRequest) {
     console.log('No user detected for public route:', pathname)
   }
 
-  console.log('=== END SESSION DEBUG ===')
   return supabaseResponse
 }
 

@@ -5,6 +5,7 @@ import { SearchAndFilters } from "@/components/catalog/searchFilters"
 import { CategoryTabs } from "@/components/catalog/categoryTabs"
 import { ProductGrid } from "@/components/catalog/productGrid"
 import handleLogout from "@/utils/handleLogout"
+import LogoutButton from "@/components/landingPage/LogoutButton"
 
 interface PageProps {
   searchParams: Promise<{
@@ -76,9 +77,7 @@ export default async function Page({ searchParams }: PageProps) {
               </Badge>
             </div>
             <div className="flex items-center space-x-4 bg-pink-700 rounded-4xl">
-          <Button variant="destructive" size="sm" type="submit" className="rounded-4xl" onClick={handleLogout}>
-            Logout
-          </Button>
+              <LogoutButton />          
             </div>
           </div>
         </div>
