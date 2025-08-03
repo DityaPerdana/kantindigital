@@ -2,8 +2,6 @@ import { ChartAreaInteractive } from '@/components/chart-area-interactive'
 import { OrdersTable } from '@/components/dashboard/oderTable'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getSalesData } from '@/utils/server/getSalesData'
-import { OrdersTable } from '@/components/dashboard/oderTable'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/utils/supabase/server'
 import { DollarSign, Package, ShoppingCart, Users } from 'lucide-react'
 
@@ -88,11 +86,7 @@ export default async function OrdersPage() {
   }));
 
   return (
-<<<<<<< HEAD
     <div className="space-y-6 p-6 ml-4">
-=======
-    <div className="space-y-6">
->>>>>>> c887188 (fix: cookie issue)
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Orders Management</h1>
         <p className="text-muted-foreground">
@@ -149,13 +143,7 @@ export default async function OrdersPage() {
           <CardTitle>Sales Overview</CardTitle>
         </CardHeader>
         <CardContent>
-<<<<<<< HEAD
           <ChartAreaInteractive salesData={salesData} />
-=======
-          <div className="flex items-center justify-center h-32 text-muted-foreground">
-            Sales chart temporarily disabled
-          </div>
->>>>>>> c887188 (fix: cookie issue)
         </CardContent>
       </Card>
 
