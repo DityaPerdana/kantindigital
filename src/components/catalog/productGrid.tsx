@@ -128,11 +128,7 @@ export function ProductGrid({ items }: ProductGridProps) {
           </Link>
           
           {/* Add to Cart Button */}
-<<<<<<< HEAD
           <div className="absolute bottom-4 right-4 transition-opacity">
-=======
-          <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
->>>>>>> c887188 (fix: cookie issue)
             <Button
               size="icon"
               variant={item.stok === 0 ? "secondary" : "default"}

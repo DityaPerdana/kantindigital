@@ -44,11 +44,7 @@ export function CatalogPageClient({
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-gray-900">FoodMart</h1>
-<<<<<<< HEAD
               <Badge variant="secondary" className="hidden sm:inline-flex text-black">
-=======
-              <Badge variant="secondary" className="hidden sm:inline-flex">
->>>>>>> c887188 (fix: cookie issue)
                 {filteredItems.length} Menu Tersedia
               </Badge>
             </div>

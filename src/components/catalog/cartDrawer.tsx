@@ -3,38 +3,39 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { useCart } from "@/utils/cartContext"
 import { createClient } from "@/utils/supabase/client"
+import { useCart } from "@/utils/cartContext"
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 export function CartDrawer() {
-  const { cartItems, updateQuantity, removeFromCart, getTotalItems, getTotalPrice, clearCart } = useCart()
   const [isOpen, setIsOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
-  const router = useRouter()
+  const { 
+    cartItems, 
+    removeFromCart, 
+    updateQuantity, 
+    clearCart, 
+    getTotalItems, 
+    getTotalPrice 
+  } = useCart()
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(price)
-  }
+  const supabase = createClient()
 
   const handleCheckout = async () => {
-    if (cartItems.length === 0) return
-    
+    if (cartItems.length === 0) {
+      alert("Your cart is empty")
+      return
+    }
+
     setIsProcessing(true)
-    const supabase = createClient()
     
     try {
       const { data: { user } } = await supabase.auth.getUser()
+      
       if (!user) {
-        alert("Please login to checkout")
-        router.push("/login")
+        alert("Please login to place an order")
         return
       }
 
@@ -45,10 +46,7 @@ export function CartDrawer() {
           user_id: user.id,
           status_id: 1,
           total_amount: getTotalPrice(),
-<<<<<<< HEAD
           orderedat: new Date().toISOString(),
-=======
->>>>>>> c887188 (fix: cookie issue)
           message: null
         })
         .select()
@@ -76,10 +74,6 @@ export function CartDrawer() {
       
       alert("Order placed successfully!")
       setIsOpen(false)
-<<<<<<< HEAD
-=======
-      // router.push('/orders') // Redirect to orders page
->>>>>>> c887188 (fix: cookie issue)
       
     } catch (error) {
       console.error("Checkout error:", error)
@@ -92,13 +86,8 @@ export function CartDrawer() {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-<<<<<<< HEAD
         <Button variant="outline" size="icon" className="relative bg-[#FFF07C]">
           <ShoppingCart className="h-5 w-5 text-black" />
-=======
-        <Button variant="outline" size="icon" className="relative">
-          <ShoppingCart className="h-5 w-5" />
->>>>>>> c887188 (fix: cookie issue)
           {getTotalItems() > 0 && (
             <Badge 
               variant="destructive" 
@@ -109,177 +98,119 @@ export function CartDrawer() {
           )}
         </Button>
       </SheetTrigger>
-<<<<<<< HEAD
+      
       <SheetContent className="w-full sm:max-w-2xl lg:max-w-3xl">
         <SheetHeader className="pb-6">
           <SheetTitle className="flex items-center gap-2 text-xl">
             <ShoppingCart className="h-6 w-6 text-black" />
-=======
-      <SheetContent className="w-full sm:max-w-lg">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <ShoppingCart className="h-5 w-5" />
->>>>>>> c887188 (fix: cookie issue)
-            Keranjang Belanja
+            Shopping Cart ({getTotalItems()} items)
           </SheetTitle>
         </SheetHeader>
         
-<<<<<<< HEAD
-        <div className="mt-6 flex-1 overflow-y-auto px-2">
-=======
-        <div className="mt-8 flex-1 overflow-y-auto">
->>>>>>> c887188 (fix: cookie issue)
+        <div className="flex flex-col h-full">
           {cartItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-              <ShoppingCart className="h-12 w-12 mb-4" />
-              <p>Keranjang belanja kosong</p>
+            <div className="flex-1 flex items-center justify-center">
+              <div className="text-center">
+                <ShoppingCart className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+                <p className="text-gray-500 text-lg">Your cart is empty</p>
+                <p className="text-gray-400 text-sm">Add some delicious items to get started!</p>
+              </div>
             </div>
           ) : (
-<<<<<<< HEAD
-            <div className="space-y-6">
-              {cartItems.map((item) => (
-                <div key={item.menuid} className="flex gap-6 p-6 bg-gray-50 rounded-lg">
-                  <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md">
-=======
-            <div className="space-y-4 text-black">
-              {cartItems.map((item) => (
-                <div key={item.menuid} className="flex gap-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md">
->>>>>>> c887188 (fix: cookie issue)
-                    <Image
-                      src={item.image_url || "/placeholder.svg"}
-                      alt={item.menuname}
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  
-<<<<<<< HEAD
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-base text-black truncate">{item.menuname}</h4>
-                    <p className="text-sm text-gray-500 mt-1">{formatPrice(item.price)}</p>
-                    
-                    <div className="mt-3 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
+            <>
+              <div className="flex-1 overflow-y-auto pr-2">
+                <div className="space-y-4">
+                  {cartItems.map((item) => (
+                    <div key={item.menuid} className="flex items-center space-x-4 bg-white p-4 rounded-lg border">
+                      <div className="relative w-16 h-16 flex-shrink-0">
+                        <Image
+                          src={item.image_url || '/placeholder-food.jpg'}
+                          alt={item.menuname}
+                          fill
+                          className="object-cover rounded-md"
+                        />
+                      </div>
+                      
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 truncate">{item.menuname}</h3>
+                        <p className="text-sm text-gray-500">Rp {item.price.toLocaleString('id-ID')}</p>
+                        <p className="text-xs text-gray-400">Stock: {item.stok}</p>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
                         <Button
                           variant="outline"
                           size="icon"
-                          className="h-9 w-9 text-black hover:text-black border border-gray-300"
+                          className="h-8 w-8"
                           onClick={() => updateQuantity(item.menuid, item.quantity - 1)}
+                          disabled={item.quantity <= 1}
                         >
-                          <Minus className="h-4 w-4" />
+                          <Minus className="h-3 w-3" />
                         </Button>
                         
-                        <span className="w-10 text-center text-base font-medium text-black">
-                          {item.quantity}
-                        </span>
+                        <span className="w-8 text-center font-medium">{item.quantity}</span>
                         
                         <Button
                           variant="outline"
                           size="icon"
-                          className="h-9 w-9 text-black hover:text-black border border-gray-300"
-                          onClick={() => updateQuantity(item.menuid, Math.min(item.quantity + 1, item.stok))}
+                          className="h-8 w-8"
+                          onClick={() => updateQuantity(item.menuid, item.quantity + 1)}
                           disabled={item.quantity >= item.stok}
                         >
-                          <Plus className="h-4 w-4" />
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => removeFromCart(item.menuid)}
+                        >
+                          <Trash2 className="h-3 w-3" />
                         </Button>
                       </div>
+                      
+                      <div className="text-right">
+                        <p className="font-medium text-gray-900">
+                          Rp {(item.price * item.quantity).toLocaleString('id-ID')}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="flex flex-col justify-between items-end flex-shrink-0">
-                    <p className="font-semibold text-base text-black">
-                      {formatPrice(item.price * item.quantity)}
-                    </p>
-                    
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50 border border-red-200 hover:border-red-300 transition-colors mt-2"
-                      onClick={() => removeFromCart(item.menuid)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-=======
-                  <div className="flex-1">
-                    <h4 className="font-semibold text-sm">{item.menuname}</h4>
-                    <p className="text-sm text-gray-500">{formatPrice(item.price)}</p>
-                    
-                    <div className="mt-2 flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.menuid, item.quantity - 1)}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      
-                      <span className="w-8 text-center text-sm font-medium">
-                        {item.quantity}
-                      </span>
-                      
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.menuid, Math.min(item.quantity + 1, item.stok))}
-                        disabled={item.quantity >= item.stok}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 ml-auto text-red-500 hover:text-white hover:bg-pink-700"
-                        onClick={() => removeFromCart(item.menuid)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="text-right">
-                    <p className="font-semibold">
-                      {formatPrice(item.price * item.quantity)}
-                    </p>
->>>>>>> c887188 (fix: cookie issue)
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+              
+              <div className="border-t pt-6 mt-6">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-lg font-medium text-gray-900">Total:</span>
+                  <span className="text-xl font-bold text-green-600">
+                    Rp {getTotalPrice().toLocaleString('id-ID')}
+                  </span>
+                </div>
+                
+                <div className="space-y-3">
+                  <Button 
+                    onClick={handleCheckout}
+                    disabled={isProcessing || cartItems.length === 0}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white py-3"
+                    size="lg"
+                  >
+                    {isProcessing ? 'Processing...' : `Checkout (${getTotalItems()} items)`}
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    onClick={() => clearCart()}
+                    className="w-full"
+                    disabled={cartItems.length === 0}
+                  >
+                    Clear Cart
+                  </Button>
+                </div>
+              </div>
+            </>
           )}
         </div>
-        
-        {cartItems.length > 0 && (
-<<<<<<< HEAD
-          <div className="border-t pt-6 mt-6 space-y-6 px-2">
-            <div className="flex justify-between text-xl font-semibold">
-              <span>Total</span>
-              <span className="text-black">{formatPrice(getTotalPrice())}</span>
-            </div>
-            
-            <Button 
-              className="w-full text-base py-6" 
-=======
-          <div className="border-t pt-4 mt-4 space-y-4">
-            <div className="flex justify-between text-lg font-semibold">
-              <span>Total</span>
-              <span>{formatPrice(getTotalPrice())}</span>
-            </div>
-            
-            <Button 
-              className="w-full" 
->>>>>>> c887188 (fix: cookie issue)
-              size="lg"
-              onClick={handleCheckout}
-              disabled={isProcessing}
-            >
-              {isProcessing ? "Processing..." : "Checkout"}
-            </Button>
-          </div>
-        )}
       </SheetContent>
     </Sheet>
   )

@@ -15,12 +15,8 @@ export async function middleware(request: NextRequest) {
   const isTestAPI = pathname.startsWith('/api/test') || pathname.startsWith('/api/upload')
 
   // If no user and trying to access protected routes, redirect to login
-<<<<<<< HEAD
-  if (!user && !isPublicRoute) {
-=======
   if (!user && !isPublicRoute && !isTestAPI) {
     console.log('No user detected, redirecting to login')
->>>>>>> c887188 (fix: cookie issue)
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)

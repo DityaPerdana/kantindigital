@@ -72,16 +72,7 @@ export async function getOrders() {
     throw new Error('Failed to fetch orders');
   }
 
-<<<<<<< HEAD
-  // Debug: log the first order to see the structure
-  if (orders && orders.length > 0) {
-    console.log('First order structure:', JSON.stringify(orders[0], null, 2))
-  }
-
-  return orders || []
-=======
   return orders || [];
->>>>>>> c887188 (fix: cookie issue)
 }
 
 export async function getStatuses() {

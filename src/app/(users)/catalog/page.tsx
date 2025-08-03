@@ -13,11 +13,7 @@ function getFilteredItems(items: any[], categoryName = "Semua", search = "", sor
   return items
     .filter(
       (item) =>
-<<<<<<< HEAD
-        (categoryName === "Semua" || item.category.categoryname === categoryName) &&
-=======
         (categoryName === "Semua" || item.category?.categoryname === categoryName) &&
->>>>>>> c887188 (fix: cookie issue)
         item.menuname.toLowerCase().includes(search.toLowerCase()),
     )
     .sort((a, b) => {
