@@ -6,7 +6,7 @@ import { browserNotificationService } from '@/utils/pushNotification'
 import { Bell, BellOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
-export function NotificationSetup() {
+export function AdminNotificationSetup() {
   const [permission, setPermission] = useState<NotificationPermission>('default')
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export function NotificationSetup() {
 
   const handleEnableNotifications = async () => {
     try {
-      console.log('Starting notification setup...')
+      console.log('Starting admin notification setup...')
       
       const hasPermission = await browserNotificationService.requestPermission()
       console.log('Permission granted:', hasPermission)
@@ -32,8 +32,8 @@ export function NotificationSetup() {
           setPermission('granted')
           // Show test notification
           await browserNotificationService.showNotification({
-            title: 'Notifikasi Push Diaktifkan!',
-            body: 'Anda akan menerima notifikasi untuk update status pesanan.',
+            title: 'Notifikasi Admin Diaktifkan!',
+            body: 'Anda akan menerima notifikasi untuk pesanan baru dan update status.',
             icon: '/icon-192x192.png'
           })
         } else {
@@ -56,7 +56,7 @@ export function NotificationSetup() {
             Notifikasi Diblokir
           </CardTitle>
           <CardDescription className="text-red-600">
-            Aktifkan notifikasi di pengaturan browser untuk mendapatkan update pesanan.
+            Aktifkan notifikasi di pengaturan browser untuk mendapatkan alert pesanan baru.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -69,10 +69,10 @@ export function NotificationSetup() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-blue-700">
             <Bell className="h-5 w-5" />
-            Aktifkan Notifikasi Push
+            Aktifkan Notifikasi Admin
           </CardTitle>
           <CardDescription className="text-blue-600">
-            Dapatkan notifikasi langsung ketika status pesanan Anda berubah.
+            Dapatkan notifikasi langsung ketika ada pesanan baru dari customer.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -90,10 +90,10 @@ export function NotificationSetup() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-green-700">
           <Bell className="h-5 w-5" />
-          Notifikasi Aktif ✓
+          Notifikasi Admin Aktif ✓
         </CardTitle>
         <CardDescription className="text-green-600">
-          Anda akan menerima notifikasi untuk update status pesanan.
+          Anda akan menerima notifikasi untuk pesanan baru dan update status.
         </CardDescription>
       </CardHeader>
     </Card>

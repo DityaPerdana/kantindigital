@@ -45,9 +45,35 @@ self.addEventListener('notificationclick', (event) => {
 
   event.notification.close()
 
-  if (event.action === 'view' || !event.action) {
-    event.waitUntil(
-      self.clients.openWindow('/dashboard')
-    )
+  const data = event.notification.data || {}
+  const orderId = data.orderId
+  
+  let targetUrl = '/orders' // Default fallback
+
+  // Determine target URL based on action and data
+  if (event.action === 'view' && orderId) {
+    targetUrl = `/order/${orderId}`
+  } else if (event.action === 'dismiss') {
+    // Just close the notification, don't navigate
+    return
+  } else if (orderId) {
+    // Default click with orderId
+    targetUrl = `/order/${orderId}`
   }
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window' }).then((clients) => {
+      // Check if there's already a window open with our target URL
+      for (const client of clients) {
+        if (client.url.includes(targetUrl) && 'focus' in client) {
+          return client.focus()
+        }
+      }
+      
+      // If no matching client found, open new window
+      if (self.clients.openWindow) {
+        return self.clients.openWindow(targetUrl)
+      }
+    })
+  )
 })

@@ -4,81 +4,25 @@ import { browserNotificationService } from '@/utils/pushNotification'
 import { useEffect, useState } from 'react'
 import { createClient } from '../utils/supabase/client'
 
-export function useRealtimeOrders(initialOrders: any[]) {
-  const [orders, setOrders] = useState<any[]>(initialOrders)
+export function useRealtimeOrder(initialOrder: any) {
+  const [order, setOrder] = useState(initialOrder)
   const supabase = createClient()
 
   useEffect(() => {
+    if (!initialOrder?.orderid) return
     // Only run on client side
     if (typeof window === 'undefined') return
-    
-    // Subscribe to new orders
+
+    // Subscribe to order status updates for this specific order
     const orderSubscription = supabase
-      .channel('orders')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'orders'
-        },
-        async (payload) => {
-          console.log('New order received:', payload)
-          
-          // Fetch the complete order data with relations
-          const { data: newOrderData } = await supabase
-            .from('orders')
-            .select(`
-              orderid,
-              message,
-              orderedat,
-              user_id,
-              status_id,
-              total_amount,
-              order_items (
-                id,
-                menu_id,
-                quantity,
-                price,
-                subtotal,
-                menu:menu_id (
-                  menuid,
-                  menuname,
-                  price,
-                  stok,
-                  category_id,
-                  image_url
-                )
-              ),
-              users:user_id (
-                userid,
-                username,
-                email
-              ),
-              status:status_id (
-                statusid,
-                statusname
-              )
-            `)
-            .eq('orderid', payload.new.orderid)
-            .single()
-
-          if (newOrderData) {
-            setOrders(prevOrders => [newOrderData, ...prevOrders])
-          }
-        }
-      )
-      .subscribe()
-
-    // Subscribe to order status updates
-    const statusSubscription = supabase
-      .channel('order_status_updates')
+      .channel(`order_${initialOrder.orderid}`)
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'orders'
+          table: 'orders',
+          filter: `orderid=eq.${initialOrder.orderid}`
         },
         async (payload) => {
           console.log('Order status updated:', payload)
@@ -90,46 +34,22 @@ export function useRealtimeOrders(initialOrders: any[]) {
           const { data: updatedOrderData } = await supabase
             .from('orders')
             .select(`
-              orderid,
-              message,
-              orderedat,
-              user_id,
-              status_id,
-              total_amount,
-              order_items (
-                id,
-                menu_id,
-                quantity,
-                price,
-                subtotal,
-                menu:menu_id (
-                  menuid,
-                  menuname,
-                  price,
-                  stok,
-                  category_id,
-                  image_url
-                )
-              ),
-              users:user_id (
-                userid,
-                username,
-                email
-              ),
+              *,
               status:status_id (
                 statusid,
                 statusname
+              ),
+              user:user_id (
+                userid,
+                username,
+                email
               )
             `)
             .eq('orderid', payload.new.orderid)
             .single()
 
           if (updatedOrderData) {
-            setOrders(prevOrders =>
-              prevOrders.map(order =>
-                order.orderid === updatedOrderData.orderid ? updatedOrderData : order
-              )
-            )
+            setOrder(updatedOrderData)
 
             // Show local notification if this is the current user's order and status changed
             if (currentUser && currentUser.id === updatedOrderData.user_id) {
@@ -145,7 +65,11 @@ export function useRealtimeOrders(initialOrders: any[]) {
                   let notificationConfig = {
                     title: '📱 Update Pesanan',
                     body: `Pesanan #${orderNumber} telah diperbarui.`,
-                    tag: `order-${orderNumber}`
+                    tag: `order-${orderNumber}`,
+                    icon: '/icon-192x192.png',
+                    data: {
+                      url: `/order/${orderNumber}`
+                    }
                   }
 
                   // Customize notification based on status
@@ -155,7 +79,11 @@ export function useRealtimeOrders(initialOrders: any[]) {
                       notificationConfig = {
                         title: '👨‍🍳 Pesanan Sedang Diproses',
                         body: `Pesanan #${orderNumber} sedang diproses. Estimasi 15-20 menit.`,
-                        tag: `order-${orderNumber}`
+                        tag: `order-${orderNumber}`,
+                        icon: '/icon-192x192.png',
+                        data: {
+                          url: `/order/${orderNumber}`
+                        }
                       }
                       break
                     case 'ready':
@@ -163,7 +91,11 @@ export function useRealtimeOrders(initialOrders: any[]) {
                       notificationConfig = {
                         title: '✅ Pesanan Siap!',
                         body: `Pesanan #${orderNumber} sudah siap! Silakan diambil.`,
-                        tag: `order-${orderNumber}`
+                        tag: `order-${orderNumber}`,
+                        icon: '/icon-192x192.png',
+                        data: {
+                          url: `/order/${orderNumber}`
+                        }
                       }
                       break
                     case 'completed':
@@ -173,7 +105,11 @@ export function useRealtimeOrders(initialOrders: any[]) {
                       notificationConfig = {
                         title: '🎉 Pesanan Selesai',
                         body: `Pesanan #${orderNumber} telah selesai. Terima kasih!`,
-                        tag: `order-${orderNumber}`
+                        tag: `order-${orderNumber}`,
+                        icon: '/icon-192x192.png',
+                        data: {
+                          url: `/order/${orderNumber}`
+                        }
                       }
                       break
                     case 'rejected':
@@ -181,7 +117,11 @@ export function useRealtimeOrders(initialOrders: any[]) {
                       notificationConfig = {
                         title: '❌ Pesanan Ditolak',
                         body: `Maaf, pesanan #${orderNumber} ditolak.`,
-                        tag: `order-${orderNumber}`
+                        tag: `order-${orderNumber}`,
+                        icon: '/icon-192x192.png',
+                        data: {
+                          url: `/order/${orderNumber}`
+                        }
                       }
                       break
                     case 'cancelled':
@@ -189,7 +129,11 @@ export function useRealtimeOrders(initialOrders: any[]) {
                       notificationConfig = {
                         title: '🚫 Pesanan Dibatalkan',
                         body: `Pesanan #${orderNumber} telah dibatalkan.`,
-                        tag: `order-${orderNumber}`
+                        tag: `order-${orderNumber}`,
+                        icon: '/icon-192x192.png',
+                        data: {
+                          url: `/order/${orderNumber}`
+                        }
                       }
                       break
                   }
@@ -207,9 +151,8 @@ export function useRealtimeOrders(initialOrders: any[]) {
 
     return () => {
       orderSubscription.unsubscribe()
-      statusSubscription.unsubscribe()
     }
-  }, [supabase])
+  }, [initialOrder?.orderid, supabase])
 
-  return orders
+  return order
 }

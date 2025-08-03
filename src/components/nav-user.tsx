@@ -1,32 +1,32 @@
 "use client"
 
 import {
-  IconBell,
-  IconBellOff,
-  IconDotsVertical,
-  IconLogout,
+    IconBell,
+    IconBellOff,
+    IconDotsVertical,
+    IconLogout,
 } from "@tabler/icons-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 
 import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
 } from "@/components/ui/avatar"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
+    useSidebar,
 } from "@/components/ui/sidebar"
 import { createClient } from "@/utils/supabase/client"
 
@@ -68,13 +68,19 @@ export function NavUser() {
       
       const hasPermission = await browserNotificationService.requestPermission()
       if (hasPermission) {
-        setNotificationPermission('granted')
-        // Test notification
-        await browserNotificationService.showNotification({
-          title: 'Notifications Enabled!',
-          body: 'You will now receive order notifications.',
-          icon: '/icon-192x192.png'
-        })
+        // Subscribe to push notifications
+        const subscribed = await browserNotificationService.subscribeToPush()
+        if (subscribed) {
+          setNotificationPermission('granted')
+          // Test notification
+          await browserNotificationService.showNotification({
+            title: 'Push Notifications Enabled!',
+            body: 'You will now receive push notifications for order updates.',
+            icon: '/icon-192x192.png'
+          })
+        } else {
+          setNotificationPermission('denied')
+        }
       } else {
         setNotificationPermission('denied')
       }

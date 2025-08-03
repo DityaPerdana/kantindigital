@@ -1,5 +1,6 @@
+import { AdminNotificationSetupClient } from '@/components/admin-notification-setup-client'
 import { ChartAreaInteractive } from '@/components/chart-area-interactive'
-import { OrdersTable } from '@/components/dashboard/oderTable'
+import { OrdersTableClient } from '@/components/dashboard/orders-table-client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getSalesData } from '@/utils/server/getSalesData'
 import { createClient } from '@/utils/supabase/server'
@@ -94,6 +95,9 @@ export default async function OrdersPage() {
         </p>
       </div>
 
+      {/* Notification Setup for Admin */}
+      <AdminNotificationSetupClient />
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -152,7 +156,7 @@ export default async function OrdersPage() {
           <CardTitle>Recent Orders</CardTitle>
         </CardHeader>
         <CardContent>
-          <OrdersTable 
+          <OrdersTableClient 
             initialOrders={normalizedOrders} 
             statuses={statuses || []} 
           />

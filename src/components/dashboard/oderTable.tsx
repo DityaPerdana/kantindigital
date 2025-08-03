@@ -2,26 +2,27 @@
 
 import { Badge } from '@/components/ui/badge'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from '@/components/ui/table'
 import {
-    Tabs,
-    TabsContent,
-    TabsList,
-    TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from '@/components/ui/tabs'
+import { useRealtimeOrdersAdmin } from '@/hooks/useRealTimeOrdersAdmin'
 import { updateOrderStatus } from '@/utils/server/updateOrderStatus'
 import { useMemo, useState } from 'react'
 
@@ -84,7 +85,8 @@ export function OrdersTable({ initialOrders, statuses }: OrdersTableProps) {
     return <div>No status data available</div>
   }
   
-  const orders = initialOrders
+  // Use real-time hook for live updates
+  const orders = useRealtimeOrdersAdmin(initialOrders)
 
   // Filter orders by status
   const filteredOrders = useMemo(() => {
