@@ -1,6 +1,6 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,10 +26,17 @@ export function OrderForm({ menuItem }: OrderFormProps) {
   const [quantity, setQuantity] = useState(1)
   const [message, setMessage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Show confirmation dialog instead of directly processing the order
+    setShowConfirmDialog(true)
+  }
+
+  const handleConfirmOrder = async () => {
+    setShowConfirmDialog(false)
     setIsLoading(true)
 
     try {
@@ -141,6 +148,10 @@ export function OrderForm({ menuItem }: OrderFormProps) {
     }
   }
 
+  const handleCancelOrder = () => {
+    setShowConfirmDialog(false)
+  }
+
   const handleQuantityChange = (newQuantity: number) => {
     const clampedValue = Math.max(1, Math.min(newQuantity, menuItem.stok))
     setQuantity(clampedValue)
@@ -159,14 +170,15 @@ export function OrderForm({ menuItem }: OrderFormProps) {
   const isOutOfStock = menuItem.stok === 0
 
   return (
-    <Card className="border-0 shadow-none bg-transparent">
-      <CardHeader className="px-0 pb-4">
-        <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
-          <ShoppingCart className="w-5 h-5" />
-          Pesan Menu Ini
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="px-0 space-y-6">
+    <>
+      <Card className="border-0 shadow-none bg-transparent">
+        <CardHeader className="px-0 pb-4">
+          <CardTitle className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            <ShoppingCart className="w-5 h-5" />
+            Pesan Menu Ini
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="px-0 space-y-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <Label htmlFor="quantity" className="text-base font-bold text-gray-800 flex items-center gap-2">
@@ -178,16 +190,14 @@ export function OrderForm({ menuItem }: OrderFormProps) {
             
             <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 p-4 rounded-xl border border-green-200 shadow-sm">
               <div className="flex items-center justify-center gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="h-12 w-12 rounded-xl border-2 border-emerald-300 hover:border-emerald-500 hover:bg-emerald-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
-                onClick={() => handleQuantityChange(quantity - 1)}
-                disabled={quantity <= 1 || isLoading}
-              >
-                <Minus className="w-5 h-5 text-emerald-700" />
-              </Button>
+                <button
+                  type="button"
+                  className="h-12 w-12 rounded-xl border-2 border-emerald-300 hover:border-emerald-500 hover:bg-emerald-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center justify-center"
+                  onClick={() => handleQuantityChange(quantity - 1)}
+                  disabled={quantity <= 1 || isLoading}
+                >
+                  <Minus className="w-5 h-5 text-emerald-700" />
+                </button>
               
               <div className="flex flex-col items-center gap-2">
                 <div className="bg-white rounded-lg border-2 border-emerald-300 focus-within:border-emerald-500 shadow-sm text-black">
@@ -213,16 +223,14 @@ export function OrderForm({ menuItem }: OrderFormProps) {
                 <span className="text-xs text-emerald-700 font-medium">porsi</span>
               </div>
               
-              <Button
+              <button
                 type="button"
-                variant="outline"
-                size="sm"
-                className="h-12 w-12 rounded-xl border-2 border-emerald-300 hover:border-emerald-500 hover:bg-emerald-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 shadow-sm"
+                className="h-12 w-12 rounded-xl border-2 border-emerald-300 hover:border-emerald-500 hover:bg-emerald-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-200 shadow-sm flex items-center justify-center"
                 onClick={() => handleQuantityChange(quantity + 1)}
                 disabled={quantity >= menuItem.stok || isLoading}
               >
                 <Plus className="w-5 h-5 text-emerald-700" />
-              </Button>
+              </button>
               </div>
               
               <div className="mt-4 pt-3 border-t border-emerald-100">
@@ -299,32 +307,32 @@ export function OrderForm({ menuItem }: OrderFormProps) {
             </div>
           </div>
           
-          <Button
+          <button
             type="submit"
-            className={`w-full h-14 text-lg font-semibold rounded-xl transition-all duration-200 ${
+            className={`w-full h-14 text-lg font-semibold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 ${
               isOutOfStock 
                 ? "bg-gray-300 hover:bg-gray-300 cursor-not-allowed" 
-                : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                : "bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-white"
             }`}
             disabled={isLoading || isOutOfStock || quantity < 1}
           >
             {isLoading ? (
-              <div className="flex items-center gap-2">
+              <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 Memproses Pesanan...
-              </div>
+              </>
             ) : isOutOfStock ? (
-              <div className="flex items-center gap-2">
+              <>
                 <Package className="w-5 h-5" />
                 Stok Habis
-              </div>
+              </>
             ) : (
-              <div className="flex items-center gap-2">
+              <>
                 <ShoppingCart className="w-5 h-5" />
                 Pesan Sekarang
-              </div>
+              </>
             )}
-          </Button>
+          </button>
 
           {!isOutOfStock && (
             <div className="text-center space-y-2">
@@ -335,9 +343,64 @@ export function OrderForm({ menuItem }: OrderFormProps) {
                 ⏱️ Estimasi waktu pembuatan: 15-20 menit
               </p>
             </div>
-          )}
-        </form>
-      </CardContent>
-    </Card>
+            )}
+          </form>
+        </CardContent>
+      </Card>
+
+      {/* Confirmation Dialog - Moved outside Card to avoid DOM nesting issues */}
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent className="max-w-md">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <ShoppingCart className="w-5 h-5 text-green-600" />
+              Konfirmasi Pesanan
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-3">
+              <div className="text-left">
+                <p className="font-medium text-gray-900 mb-2">Detail Pesanan:</p>
+                <div className="bg-gray-50 p-3 rounded-lg space-y-1">
+                  <p className="text-sm"><span className="font-medium">Menu:</span> {menuItem.menuname}</p>
+                  <p className="text-sm"><span className="font-medium">Jumlah:</span> {quantity} porsi</p>
+                  <p className="text-sm"><span className="font-medium">Harga satuan:</span> {formatPrice(menuItem.price)}</p>
+                  {message && (
+                    <p className="text-sm"><span className="font-medium">Pesan tambahan:</span> {message}</p>
+                  )}
+                  <hr className="my-2" />
+                  <p className="text-sm font-bold text-green-600">
+                    <span className="font-medium text-gray-900">Total:</span> {formatPrice(totalPrice)}
+                  </p>
+                </div>
+              </div>
+              <p className="text-center text-gray-600">
+                Apakah Anda yakin ingin melanjutkan pesanan ini?
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="gap-2">
+            <button 
+              onClick={handleCancelOrder}
+              className="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+            >
+              Batal
+            </button>
+            <button 
+              onClick={handleConfirmOrder}
+              className="flex-1 px-4 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Memproses...
+                </>
+              ) : (
+                "Ya, Pesan Sekarang"
+              )}
+            </button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   )
 }

@@ -6,7 +6,10 @@ import { ProductGrid } from "@/components/catalog/productGrid"
 import { SearchAndFilters } from "@/components/catalog/searchFilters"
 import LogoutButton from "@/components/landingPage/LogoutButton"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import { CartProvider } from '@/utils/cartContext'
+import { History } from "lucide-react"
+import Link from "next/link"
 
 interface FoodItem {
   menuid: number
@@ -49,6 +52,17 @@ export function CatalogPageClient({
               </Badge>
             </div>
             <div className="flex items-center space-x-4">
+              <Link href="/orders">
+                <Button variant="outline" size="sm" className="hidden sm:flex border-gray-300 text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-50">
+                  <History className="w-4 h-4 mr-2" />
+                  Riwayat Pesanan
+                </Button>
+              </Link>
+              <Link href="/orders" className="sm:hidden">
+                <Button variant="outline" size="icon" className="border-gray-300 text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-50">
+                  <History className="w-4 h-4" />
+                </Button>
+              </Link>
               <CartDrawer />
               <div className="bg-pink-700 rounded-4xl">
                 <LogoutButton />

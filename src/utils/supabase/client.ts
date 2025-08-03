@@ -9,6 +9,10 @@ export function createClient() {
         get(name: string) {
           // Custom cookie getter that handles invalid domain issues
           try {
+            // Check if we're in the browser environment
+            if (typeof document === 'undefined') {
+              return undefined
+            }
             return document.cookie
               .split('; ')
               .find(row => row.startsWith(`${name}=`))
@@ -21,6 +25,11 @@ export function createClient() {
         set(name: string, value: string, options: any) {
           // Custom cookie setter with safer options
           try {
+            // Check if we're in the browser environment
+            if (typeof document === 'undefined') {
+              return
+            }
+            
             const cookieOptions = {
               ...options,
               // Don't set domain explicitly in browser

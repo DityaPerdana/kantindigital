@@ -3,15 +3,17 @@
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
-import { createClient } from "@/utils/supabase/client"
 import { useCart } from "@/utils/cartContext"
+import { createClient } from "@/utils/supabase/client"
 import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 export function CartDrawer() {
   const [isOpen, setIsOpen] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
+  const router = useRouter()
   const { 
     cartItems, 
     removeFromCart, 
@@ -72,8 +74,10 @@ export function CartDrawer() {
       // Clear the cart
       await clearCart()
       
-      alert("Order placed successfully!")
+      // Redirect to order detail page
+      alert("Order berhasil dibuat! Anda akan dialihkan ke halaman detail pesanan.")
       setIsOpen(false)
+      router.push(`/order/${order.orderid}`)
       
     } catch (error) {
       console.error("Checkout error:", error)
